@@ -36,3 +36,6 @@ rsa_key.p8
 rsa_key.pub
 
 data/
+
+snowflake_key.p8
+vinci-vandyhacks-e8473d67b5e1.json
