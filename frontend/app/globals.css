@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --background: #020817;
+  --foreground: #f8fafc;
+  --gold: #C9A84C;
+  --navy: #0F1F3D;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Gold focus ring for inputs */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #C9A84C !important;
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.8s infinite linear;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0;  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* Paper texture for letter */
+.paper-card {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(15,31,61,0.08), 0 4px 24px rgba(0,0,0,0.3);
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .font-mono-ref { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; }
+  .gold-border-left { border-left: 3px solid #C9A84C; }
+  .amber-border-left { border-left: 3px solid #F59E0B; }
+  .green-border-left { border-left: 3px solid #22c55e; }
+}

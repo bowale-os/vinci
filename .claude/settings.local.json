@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C c:UsersdanieDesktopDevhackathonsvandyhacks ls-files)",
+      "Bash(npx create-next-app@14 frontend --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(npm install:*)",
+      "WebSearch",
+      "WebFetch(domain:www.cms.gov)",
+      "WebFetch(domain:healthesystems.com)",
+      "Bash(grep -E \"\\\\.csv$\")",
+      "Bash(python -c \":*)",
+      "Bash(ls c:/Users/danie/Desktop/Dev/hackathons/vandyhacks/backend/*.json)"
+    ]
+  }
+}
