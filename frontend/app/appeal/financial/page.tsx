@@ -133,12 +133,6 @@ export default function FinancialPage() {
               })}
             </div>
 
-            {/* Quote */}
-            <p className="text-center mb-8 animate-fade-in-up"
-              style={{ fontSize: "0.9rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontStyle: "italic" }}>
-              "The appeal takes 60 seconds. The savings are real. The choice is easy."
-            </p>
-
             {/* Savings banner */}
             <div className="flex items-center justify-between p-6 rounded-[16px] mb-8 animate-fade-in-up"
               style={{ background: "var(--gold-light)", border: "1px solid var(--gold-border)" }}>

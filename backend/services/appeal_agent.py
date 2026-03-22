@@ -33,7 +33,7 @@ from services.clinicaltrials_client import search_trials
 from services.gemini_client import generate_appeal_letter
 
 genai.configure(api_key=settings.google_api_key)
-_model = genai.GenerativeModel("gemini-1.5-flash")
+_model = genai.GenerativeModel("gemini-2.5-flash")
 
 MAX_ITERATIONS = 5
 
@@ -103,8 +103,8 @@ Available tools (call them by returning JSON with "tool" and "args"):
   fetch_trials(condition, intervention)     — ClinicalTrials.gov completed studies
 
 Respond with ONE of:
-  A) A tool call:  {"tool": "tool_name", "args": {...}}
-  B) Done signal:  {"done": true, "evidence_summary": "<structured summary of all evidence found>"}
+  A) A tool call:  {{"tool": "tool_name", "args": {{...}}}}
+  B) Done signal:  {{"done": true, "evidence_summary": "<structured summary of all evidence found>"}}
 
 Rules:
   - Never call the same tool with identical args twice

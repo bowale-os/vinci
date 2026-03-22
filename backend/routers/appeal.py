@@ -69,6 +69,17 @@ class AudioResponse(BaseModel):
     audio_url: str
 
 
+class ReviseRequest(BaseModel):
+    letter_text: str
+    feedback: str
+    denial_reason: Optional[str] = None
+    insurer_name: Optional[str] = None
+
+
+class ReviseResponse(BaseModel):
+    letter_text: str
+
+
 @router.post("/generate", response_model=AppealLetter)
 async def generate_appeal(request: AppealRequest):
     """
@@ -84,6 +95,8 @@ async def generate_appeal(request: AppealRequest):
             patient_state=request.patient_state,
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Appeal generation failed: {e}")
 
     return AppealLetter(
@@ -96,6 +109,45 @@ async def generate_appeal(request: AppealRequest):
     )
 
 
+@router.post("/revise", response_model=ReviseResponse)
+async def revise_appeal(request: ReviseRequest):
+    """
+    Revise an existing appeal letter based on user feedback.
+    Preserves the formal structure and evidence while applying the requested changes.
+    """
+    from services.gemini_client import _model
+    import re
+    prompt = f"""You are revising a prior authorization appeal letter based on specific feedback from the patient.
+
+ORIGINAL LETTER:
+{request.letter_text}
+
+DENIAL CONTEXT:
+- Insurer: {request.insurer_name or "Not specified"}
+- Denial reason: {request.denial_reason or "Not specified"}
+
+USER FEEDBACK — what needs to change:
+{request.feedback}
+
+Instructions:
+- Apply ONLY the changes described in the feedback. Do not rewrite sections that are not mentioned.
+- Preserve all legal citations, evidence references, and formal structure.
+- Keep the same 5-paragraph format and Times New Roman letter style.
+- If the feedback corrects a factual error (wrong name, wrong date, wrong medication), fix it precisely.
+- If the feedback asks to strengthen an argument, expand only that paragraph.
+- Return only the revised letter text — no commentary, no explanation, no markdown."""
+
+    try:
+        resp = _model.generate_content([{"role": "user", "parts": [prompt]}])
+        revised = resp.text.strip()
+        revised = re.sub(r"^```(?:text)?\s*", "", revised)
+        revised = re.sub(r"\s*```$", "", revised)
+        return ReviseResponse(letter_text=revised)
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Revision failed: {e}")
+
+
 @router.post("/audio", response_model=AudioResponse)
 async def generate_audio(request: AudioRequest):
     """Convert appeal letter text to audio via ElevenLabs TTS."""
@@ -103,5 +155,6 @@ async def generate_audio(request: AudioRequest):
     try:
         audio_url = await synthesize_speech(request.letter_text)
     except Exception as e:
+        import traceback; traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Audio generation failed: {e}")
     return AudioResponse(audio_url=audio_url)

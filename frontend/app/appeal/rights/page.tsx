@@ -44,7 +44,6 @@ export default function RightsPage() {
   const days = denial?.deadline ? daysUntil(denial.deadline) : null;
 
   useEffect(() => {
-    api.get("/api/financial/accounts", { params: { customer_id: "state_lookup" } }).catch(() => {});
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/financial/simulate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

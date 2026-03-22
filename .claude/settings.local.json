@@ -9,7 +9,9 @@
       "WebFetch(domain:healthesystems.com)",
       "Bash(grep -E \"\\\\.csv$\")",
       "Bash(python -c \":*)",
-      "Bash(ls c:/Users/danie/Desktop/Dev/hackathons/vandyhacks/backend/*.json)"
+      "Bash(ls c:/Users/danie/Desktop/Dev/hackathons/vandyhacks/backend/*.json)",
+      "Bash(npm uninstall:*)",
+      "Bash(xargs grep:*)"
     ]
   }
 }
