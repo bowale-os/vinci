@@ -19,11 +19,9 @@ const SECTIONS = [
 ];
 
 function splitLetter(text: string): Record<string, string> {
-  // Heuristic split — works for Gemini-formatted letters
   const lines = text.split("\n");
   const result: Record<string, string> = {};
   let current = "patient";
-  const chunks: string[] = [];
   for (const line of lines) {
     const l = line.toLowerCase();
     if (l.includes("re:") || l.includes("appeal") || l.includes("denial")) { current = "reference"; }
@@ -34,6 +32,13 @@ function splitLetter(text: string): Record<string, string> {
   }
   return result;
 }
+
+const card = {
+  background: "#FFFFFF",
+  border: "1px solid rgba(15,31,61,0.06)",
+  borderRadius: "16px",
+  boxShadow: "0 2px 8px rgba(15,31,61,0.06)",
+};
 
 export default function LetterPage() {
   const router = useRouter();
@@ -93,63 +98,90 @@ export default function LetterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen" style={{ background: "var(--warm-white)" }}>
       <Nav />
-      <div className="pt-20 pb-16 px-4 max-w-3xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Your appeal letter is ready</h1>
-          <p className="text-slate-400">Built on your insurer's own rules. Backed by medical evidence. Addressed to the right place.</p>
+      <div className="pt-24 pb-20 px-6 max-w-3xl mx-auto">
+
+        <div className="mb-8 animate-fade-in-up">
+          <h1 style={{ color: "var(--text-primary)", marginBottom: "0.75rem" }}>Your appeal letter is ready</h1>
+          <p style={{ color: "var(--text-secondary)", fontFamily: "var(--font-inter)", maxWidth: "55ch" }}>
+            Built on your insurer's own rules. Backed by medical evidence. Addressed to the right place.
+          </p>
         </div>
 
-        {loading && <div className="space-y-4"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>}
+        {loading && (
+          <div className="space-y-4">
+            <SkeletonCard /><SkeletonCard /><SkeletonCard />
+          </div>
+        )}
 
         {letter && !loading && (
           <>
             {/* Letter preview — paper feel */}
-            <div className="paper-card rounded-2xl overflow-hidden mb-5">
+            <div className="paper-card rounded-[16px] overflow-hidden mb-5 animate-fade-in-up stagger-1">
               {SECTIONS.map(({ key, label }) => {
                 const content = sections[key];
                 if (!content?.trim()) return null;
                 return (
-                  <div key={key} className="border-b border-slate-100/60 last:border-0">
-                    <div className="px-6 py-2 bg-slate-50/5 border-b border-slate-100/30">
-                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{label}</span>
+                  <div key={key} style={{ borderBottom: "1px solid rgba(15,31,61,0.07)" }} className="last:border-0">
+                    <div className="px-8 py-2.5" style={{ background: "rgba(15,31,61,0.025)", borderBottom: "1px solid rgba(15,31,61,0.06)" }}>
+                      <span style={{ fontSize: "0.7rem", fontWeight: 500, color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                        {label}
+                      </span>
                     </div>
-                    <div className="px-6 py-5">
-                      <p className="text-slate-800 dark:text-slate-200 text-sm leading-7 whitespace-pre-wrap font-serif">{content.trim()}</p>
+                    <div className="px-8 py-6">
+                      <p style={{ color: "#1A2A40", fontSize: "0.9rem", lineHeight: 1.85, whiteSpace: "pre-wrap", fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                        {content.trim()}
+                      </p>
                     </div>
                   </div>
                 );
               })}
-              {/* Fallback: render full text if sections are empty */}
               {Object.keys(sections).length === 0 && (
-                <div className="px-6 py-8">
-                  <p className="text-slate-200 text-sm leading-7 whitespace-pre-wrap">{letter.letter_text}</p>
+                <div className="px-8 py-8">
+                  <p style={{ color: "#1A2A40", fontSize: "0.9rem", lineHeight: 1.85, whiteSpace: "pre-wrap", fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                    {letter.letter_text}
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Audio player */}
-            <div className="bg-[#0F1F3D] border border-slate-700 rounded-2xl p-5 mb-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Volume2 size={16} className="text-[#C9A84C]" />
-                  <p className="text-sm font-medium text-slate-200">Listen to your letter before sending</p>
+            <div className="p-6 mb-5 rounded-[16px] animate-fade-in-up stagger-2"
+              style={{ background: "var(--navy)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  <Volume2 size={15} style={{ color: "var(--gold)" }} />
+                  <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "rgba(255,255,255,0.9)", fontFamily: "var(--font-inter)" }}>
+                    Listen before you send
+                  </p>
                 </div>
-                <span className="text-xs text-slate-500">Hear it read aloud to catch anything before you submit.</span>
+                <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-inter)" }}>
+                  Catch anything before you submit.
+                </span>
               </div>
               <div className="flex items-center gap-4">
-                <button onClick={playing ? () => { audioRef.current?.pause(); setPlaying(false); } : handleAudio}
+                <button
+                  onClick={playing ? () => { audioRef.current?.pause(); setPlaying(false); } : handleAudio}
                   disabled={audioLoading}
-                  className="w-10 h-10 rounded-full bg-[#C9A84C] flex items-center justify-center text-[#0F1F3D] hover:bg-[#E4C97A] transition-colors shrink-0 disabled:opacity-50">
-                  {audioLoading ? <span className="w-4 h-4 border-2 border-[#0F1F3D] border-t-transparent rounded-full animate-spin" />
-                    : playing ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform duration-150 hover:scale-[1.06] disabled:opacity-40"
+                  style={{ background: "var(--gold)" }}
+                >
+                  {audioLoading
+                    ? <span className="w-4 h-4 border-2 border-[#0F1F3D] border-t-transparent rounded-full animate-spin" />
+                    : playing
+                      ? <Pause size={15} fill="#0F1F3D" color="#0F1F3D" />
+                      : <Play  size={15} fill="#0F1F3D" color="#0F1F3D" style={{ marginLeft: "1px" }} />
+                  }
                 </button>
-                {/* Waveform visualization (static decorative) */}
+                {/* Waveform */}
                 <div className="flex-1 flex items-center gap-0.5 h-8">
                   {Array.from({ length: 48 }).map((_, i) => (
-                    <div key={i} className="flex-1 rounded-full transition-all"
-                      style={{ height: `${20 + Math.sin(i * 0.7) * 12 + Math.random() * 8}px`, background: playing ? "#C9A84C" : "#334155" }} />
+                    <div key={i} className="flex-1 rounded-full transition-colors duration-300"
+                      style={{
+                        height: `${20 + Math.sin(i * 0.7) * 12 + ((i * 17) % 8)}px`,
+                        background: playing ? "var(--gold)" : "rgba(255,255,255,0.15)",
+                      }} />
                   ))}
                 </div>
                 {audioSrc && <audio ref={audioRef} src={audioSrc} onEnded={() => setPlaying(false)} className="hidden" />}
@@ -158,13 +190,19 @@ export default function LetterPage() {
 
             {/* Citations */}
             {letter.citations?.length > 0 && (
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-5">
-                <p className="text-xs text-slate-500 uppercase tracking-wide mb-3">Medical evidence cited</p>
-                <ul className="space-y-2">
+              <div style={card} className="p-6 mb-5 animate-fade-in-up stagger-3">
+                <p style={{ fontSize: "0.7rem", fontWeight: 500, color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "1rem" }}>
+                  Medical evidence cited
+                </p>
+                <ul className="space-y-3">
                   {letter.citations.slice(0, 5).map(c => (
-                    <li key={c.pmid ?? c.title} className="flex items-start gap-2 text-sm">
-                      <span className="font-mono-ref text-[#C9A84C] shrink-0">PMID:{c.pmid}</span>
-                      <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-white hover:underline">{c.title}</a>
+                    <li key={c.pmid ?? c.title} className="flex items-start gap-3" style={{ fontSize: "0.875rem" }}>
+                      <span className="font-mono-ref shrink-0" style={{ color: "var(--gold)" }}>PMID:{c.pmid}</span>
+                      <a href={c.url} target="_blank" rel="noopener noreferrer"
+                        style={{ color: "var(--text-secondary)", fontFamily: "var(--font-inter)", lineHeight: 1.5 }}
+                        className="hover:underline hover:text-[#0F1F3D] transition-colors">
+                        {c.title}
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -172,25 +210,30 @@ export default function LetterPage() {
             )}
 
             {/* Actions */}
-            <div className="flex flex-col gap-3 mb-6">
-              <Button size="lg" fullWidth onClick={handleDownload}><Download size={18} /> Download as PDF</Button>
+            <div className="flex flex-col gap-3 mb-6 animate-fade-in-up stagger-4">
+              <Button size="lg" fullWidth onClick={handleDownload}>
+                <Download size={18} /> Download as PDF
+              </Button>
               <Button size="lg" variant="secondary" fullWidth onClick={handleCopy}>
                 {copied ? <><CheckCircle size={18} /> Copied!</> : <><Copy size={18} /> Copy to clipboard</>}
               </Button>
             </div>
 
             {/* Submission instructions */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-5">
-              <h3 className="font-semibold text-slate-100 mb-4">How to submit your appeal</h3>
-              <ol className="space-y-3">
+            <div style={card} className="p-8 mb-5 animate-fade-in-up stagger-5">
+              <h3 style={{ color: "var(--text-primary)", marginBottom: "1.25rem" }}>How to submit your appeal</h3>
+              <ol className="space-y-4">
                 {[
                   "Download or copy the letter above",
                   `Send to: ${denial?.insurer_name ?? "your insurer"}'s Appeals Department (address on your denial letter)`,
                   "Keep a copy for your records and note the date you submitted",
                   "If you don't hear back within 60 days, contact your state insurance department — that delay may itself be grounds for further action",
                 ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
-                    <span className="w-6 h-6 rounded-full bg-[#C9A84C]/15 text-[#C9A84C] flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</span>
+                  <li key={i} className="flex items-start gap-3" style={{ fontSize: "0.875rem", color: "var(--text-secondary)", fontFamily: "var(--font-inter)" }}>
+                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                      style={{ background: "var(--gold-light)", color: "var(--gold)", fontFamily: "var(--font-mono)" }}>
+                      {i + 1}
+                    </span>
                     {step}
                   </li>
                 ))}
@@ -198,24 +241,30 @@ export default function LetterPage() {
             </div>
 
             {/* What happens next */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-              <h3 className="font-semibold text-slate-100 mb-4">What happens next</h3>
-              <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500 mb-4">
+            <div style={card} className="p-8 animate-fade-in-up">
+              <h3 style={{ color: "var(--text-primary)", marginBottom: "1.25rem" }}>What happens next</h3>
+              <div className="flex items-center gap-2 flex-wrap mb-4">
                 {["You submit", "60 days for insurer", "If denied: external review", "82% of external reviews succeed"].map((s, i, arr) => (
                   <span key={s} className="flex items-center gap-2">
-                    <span className="text-slate-300">{s}</span>
-                    {i < arr.length - 1 && <span className="text-slate-700">→</span>}
+                    <span style={{ fontSize: "0.85rem", color: i === 0 ? "var(--text-primary)" : "var(--text-secondary)", fontFamily: "var(--font-inter)", fontWeight: i === 0 ? 500 : 400 }}>
+                      {s}
+                    </span>
+                    {i < arr.length - 1 && <span style={{ color: "rgba(15,31,61,0.20)", fontSize: "0.75rem" }}>→</span>}
                   </span>
                 ))}
               </div>
-              <p className="text-sm text-slate-500">Vinci saves your appeal so you can track its status and escalate if needed.</p>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)" }}>
+                Vinci saves your appeal so you can track its status and escalate if needed.
+              </p>
             </div>
           </>
         )}
 
         {!loading && !letter && (
-          <div className="text-center py-16">
-            <p className="text-slate-500 mb-4">Upload your denial letter above and we'll get started</p>
+          <div className="text-center py-20 animate-fade-in-up">
+            <p style={{ color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", marginBottom: "1.5rem" }}>
+              Upload your denial letter above and we'll get started
+            </p>
             <Button variant="secondary" onClick={() => router.push("/denial")}>Upload denial letter</Button>
           </div>
         )}

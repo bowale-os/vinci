@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, TrendingDown, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, AlertTriangle } from "lucide-react";
 import { useVinci } from "@/context/VinciContext";
 import { useToast } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/Button";
@@ -27,6 +27,13 @@ function MiniChart({ trajectory, color }: { trajectory: { month: number; balance
   );
 }
 
+const cardBase = {
+  background: "#FFFFFF",
+  borderRadius: "16px",
+  boxShadow: "0 2px 8px rgba(15,31,61,0.06)",
+  transition: "box-shadow 200ms ease, transform 200ms ease",
+};
+
 export default function FinancialPage() {
   const router = useRouter();
   const toast = useToast();
@@ -48,48 +55,76 @@ export default function FinancialPage() {
 
   const fmtDollar = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
-  const scenarioMeta = {
-    A: { icon: CheckCircle, badge: "Recommended", goldBorder: true },
-    B: { icon: TrendingDown, badge: null,          goldBorder: false },
-    C: { icon: AlertTriangle, badge: null,         goldBorder: false },
-  };
-
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen" style={{ background: "var(--warm-white)" }}>
       <Nav />
-      <div className="pt-20 pb-16 px-4 max-w-5xl mx-auto">
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold mb-2">Here's what this denial is actually costing you</h1>
-          <p className="text-slate-400">Three paths forward. One obvious choice.</p>
+      <div className="pt-24 pb-20 px-6 max-w-[1200px] mx-auto">
+
+        <div className="mb-12 animate-fade-in-up" style={{ maxWidth: "600px" }}>
+          <h1 style={{ color: "var(--text-primary)", marginBottom: "0.75rem" }}>
+            Here's what this denial is actually costing you
+          </h1>
+          <p style={{ color: "var(--text-secondary)", fontFamily: "var(--font-inter)" }}>
+            Three paths forward. One obvious choice.
+          </p>
         </div>
 
-        {loading && <div className="grid grid-cols-1 sm:grid-cols-3 gap-5"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <SkeletonCard /><SkeletonCard /><SkeletonCard />
+          </div>
+        )}
 
         {data && !loading && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
-              {(["A", "B", "C"] as const).map(key => {
+            {/* Scenario cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+              {(["A", "B", "C"] as const).map((key, i) => {
                 const s = data.scenarios[key];
-                const { icon: Icon, badge, goldBorder } = scenarioMeta[key];
+                const isRecommended = key === "A";
                 return (
-                  <div key={key} className={`bg-slate-900 rounded-2xl p-6 flex flex-col gap-4 border-2 transition-all ${goldBorder ? "border-[#C9A84C]" : "border-slate-800"}`}>
-                    {badge && (
-                      <span className="self-start px-3 py-1 rounded-full text-xs font-semibold bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/25">
-                        {badge}
+                  <div key={key}
+                    className={`p-8 flex flex-col gap-5 animate-fade-in-up stagger-${i + 1}`}
+                    style={{
+                      ...cardBase,
+                      border: isRecommended
+                        ? "2px solid var(--gold)"
+                        : "1px solid rgba(15,31,61,0.06)",
+                    }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(15,31,61,0.10)";
+                      (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(15,31,61,0.06)";
+                      (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                    }}
+                  >
+                    {isRecommended && (
+                      <span className="self-start px-3 py-1 rounded-full text-xs font-medium"
+                        style={{ background: "var(--gold-light)", color: "var(--gold)", border: "1px solid var(--gold-border)", fontFamily: "var(--font-inter)", letterSpacing: "0.02em" }}>
+                        Recommended
                       </span>
                     )}
+
                     <div>
-                      <p className="text-4xl font-bold mb-1" style={{ color: s.color }}>
+                      <p style={{ fontFamily: "var(--font-jakarta)", fontWeight: 800, fontSize: "2.25rem", color: s.color, letterSpacing: "-0.03em", lineHeight: 1 }}>
                         {fmtDollar(s.total_12m_cost)}{key === "C" && "+"}
                       </p>
-                      <p className="text-xs text-slate-500 uppercase tracking-wide">
+                      <p className="mt-1" style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase" }}>
                         {key === "A" ? "Additional out-of-pocket cost" : key === "B" ? "Cost over 12 months" : "Average ER visit cost"}
                       </p>
                     </div>
-                    <p className="text-sm text-slate-400 leading-relaxed flex-1">{s.description}</p>
+
+                    <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", fontFamily: "var(--font-inter)", lineHeight: 1.65, flex: 1 }}>
+                      {s.description}
+                    </p>
+
                     {key !== "A" && (
                       <div className="mt-auto">
-                        <p className="text-xs text-slate-600 mb-1">12-month balance trajectory</p>
+                        <p style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", marginBottom: "0.375rem" }}>
+                          12-month balance trajectory
+                        </p>
                         <MiniChart trajectory={s.trajectory} color={s.color} />
                       </div>
                     )}
@@ -98,16 +133,24 @@ export default function FinancialPage() {
               })}
             </div>
 
-            <p className="text-center text-slate-400 text-sm mb-8 italic">
+            {/* Quote */}
+            <p className="text-center mb-8 animate-fade-in-up"
+              style={{ fontSize: "0.9rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontStyle: "italic" }}>
               "The appeal takes 60 seconds. The savings are real. The choice is easy."
             </p>
 
-            <div className="bg-slate-900/60 border border-[#C9A84C]/20 rounded-2xl p-5 flex items-center justify-between mb-8">
+            {/* Savings banner */}
+            <div className="flex items-center justify-between p-6 rounded-[16px] mb-8 animate-fade-in-up"
+              style={{ background: "var(--gold-light)", border: "1px solid var(--gold-border)" }}>
               <div>
-                <p className="text-sm text-slate-400">Appealing saves you up to</p>
-                <p className="text-2xl font-bold text-[#C9A84C]">{fmtDollar(data.summary.best_case_savings)}</p>
+                <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", fontFamily: "var(--font-inter)", marginBottom: "0.25rem" }}>
+                  Appealing saves you up to
+                </p>
+                <p style={{ fontFamily: "var(--font-jakarta)", fontWeight: 800, fontSize: "2rem", color: "var(--gold)", letterSpacing: "-0.03em" }}>
+                  {fmtDollar(data.summary.best_case_savings)}
+                </p>
               </div>
-              <CheckCircle size={32} className="text-[#C9A84C]" />
+              <CheckCircle size={32} style={{ color: "var(--gold)" }} />
             </div>
 
             <Button size="lg" fullWidth onClick={() => router.push("/appeal/rights")}>
@@ -117,8 +160,10 @@ export default function FinancialPage() {
         )}
 
         {!loading && !data && (
-          <div className="text-center py-16 text-slate-500">
-            <p className="mb-4">Upload a denial letter first to see your financial simulation.</p>
+          <div className="text-center py-20 animate-fade-in-up">
+            <p style={{ color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", marginBottom: "1.5rem" }}>
+              Upload a denial letter first to see your financial simulation.
+            </p>
             <Button variant="secondary" onClick={() => router.push("/denial")}>Upload denial letter</Button>
           </div>
         )}

@@ -5,6 +5,14 @@ import { Stethoscope, User, ArrowRight, Shield } from "lucide-react";
 import { useVinci } from "@/context/VinciContext";
 import type { UserRole } from "@/types";
 
+const cardStyle = {
+  background: "#FFFFFF",
+  border: "1px solid rgba(15,31,61,0.08)",
+  borderRadius: "16px",
+  boxShadow: "0 2px 8px rgba(15,31,61,0.06)",
+  transition: "box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease",
+};
+
 function RolePageInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -26,32 +34,63 @@ function RolePageInner() {
   if (as === "patient" || as === "doctor") return null;
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4">
-      <div className="flex items-center gap-2 mb-10">
-        <Shield size={22} className="text-[#C9A84C]" />
-        <span className="font-bold text-xl">Vinci</span>
-      </div>
-      <h1 className="text-3xl font-bold text-center mb-3">Who are you here for?</h1>
-      <p className="text-slate-400 text-center mb-10 max-w-sm">We tailor the experience based on your role.</p>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: "var(--warm-white)" }}>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-lg">
+      {/* Logo */}
+      <div className="flex items-center gap-2 mb-12 animate-fade-in-up"
+        style={{ fontFamily: "var(--font-jakarta)", fontWeight: 700, fontSize: "1.2rem", color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
+        <Shield size={20} className="text-[#C9A84C]" strokeWidth={2.5} />
+        Vinci
+      </div>
+
+      {/* Heading */}
+      <h1 className="text-center mb-3 animate-fade-in-up stagger-1" style={{ color: "var(--text-primary)" }}>
+        Who are you here for?
+      </h1>
+      <p className="text-center mb-12 animate-fade-in-up stagger-2"
+        style={{ color: "var(--text-secondary)", maxWidth: "38ch", fontFamily: "var(--font-inter)" }}>
+        We tailor the experience based on your role.
+      </p>
+
+      {/* Role cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-lg animate-fade-in-up stagger-3">
         {([
-          { role: "patient" as UserRole, Icon: User,          label: "I'm a Patient",  sub: "I received a denial and need help appealing it." },
-          { role: "doctor"  as UserRole, Icon: Stethoscope,   label: "I'm a Doctor",   sub: "I'm helping a patient navigate their prior auth." },
+          { role: "patient" as UserRole, Icon: User,        label: "I'm a Patient", sub: "I received a denial and need help appealing it." },
+          { role: "doctor"  as UserRole, Icon: Stethoscope, label: "I'm a Doctor",  sub: "I'm helping a patient navigate their prior auth." },
         ]).map(({ role, Icon, label, sub }) => (
-          <button key={role} onClick={() => select(role)}
-            className="group flex flex-col items-start gap-4 p-6 bg-slate-900 border border-slate-800 rounded-2xl hover:border-[#C9A84C]/50 hover:bg-slate-900/80 transition-all text-left">
-            <div className="w-12 h-12 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center group-hover:bg-[#C9A84C]/20 transition-colors">
-              <Icon size={22} className="text-[#C9A84C]" />
+          <button
+            key={role}
+            onClick={() => select(role)}
+            className="group flex flex-col items-start gap-5 p-8 text-left"
+            style={cardStyle}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(15,31,61,0.10)";
+              (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,168,76,0.40)";
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(15,31,61,0.06)";
+              (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(15,31,61,0.08)";
+            }}
+          >
+            <div className="w-12 h-12 rounded-[12px] flex items-center justify-center"
+              style={{ background: "var(--gold-light)" }}>
+              <Icon size={22} style={{ color: "var(--gold)" }} />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-slate-100 mb-1">{label}</p>
-              <p className="text-sm text-slate-500">{sub}</p>
+              <p style={{ fontFamily: "var(--font-jakarta)", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.375rem" }}>
+                {label}
+              </p>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", lineHeight: 1.55 }}>
+                {sub}
+              </p>
             </div>
-            <ArrowRight size={16} className="text-slate-600 group-hover:text-[#C9A84C] transition-colors self-end" />
+            <ArrowRight size={15} style={{ color: "var(--text-tertiary)", alignSelf: "flex-end" }} />
           </button>
         ))}
       </div>
+
     </div>
   );
 }

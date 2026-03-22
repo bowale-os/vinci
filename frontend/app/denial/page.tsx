@@ -18,6 +18,13 @@ function daysUntil(dateStr: string): number | null {
   return Math.ceil((d.getTime() - Date.now()) / 86400000);
 }
 
+const card = {
+  background: "#FFFFFF",
+  border: "1px solid rgba(15,31,61,0.06)",
+  borderRadius: "16px",
+  boxShadow: "0 2px 8px rgba(15,31,61,0.06)",
+};
+
 export default function DenialPage() {
   const router = useRouter();
   const toast = useToast();
@@ -64,28 +71,51 @@ export default function DenialPage() {
   const days = result ? daysUntil(result.deadline) : null;
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen" style={{ background: "var(--warm-white)" }}>
       <Nav />
-      <div className="pt-20 pb-16 px-4 max-w-6xl mx-auto">
+      <div className="pt-24 pb-20 px-6 max-w-[1200px] mx-auto">
 
-        {/* Drop zone — only shown before results */}
+        {/* Upload zone — only shown before results */}
         {!result && !loading && (
-          <div className="max-w-xl mx-auto mt-16">
+          <div className="max-w-xl mx-auto mt-12 animate-fade-in-up">
+            {/* Page title */}
+            <div className="mb-10">
+              <h1 style={{ color: "var(--text-primary)", marginBottom: "0.75rem" }}>
+                Upload your denial letter
+              </h1>
+              <p style={{ color: "var(--text-secondary)", fontFamily: "var(--font-inter)", maxWidth: "50ch" }}>
+                We'll read it and explain exactly what it means — and how to fight it.
+              </p>
+            </div>
+
             <div
               onClick={() => fileRef.current?.click()}
               onDrop={onDrop}
               onDragOver={e => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
-              className={`cursor-pointer border-2 border-dashed rounded-2xl p-16 flex flex-col items-center gap-4 transition-all ${dragging ? "border-[#C9A84C] bg-[#C9A84C]/5" : "border-slate-700 hover:border-slate-500 bg-slate-900/40"}`}
+              className="cursor-pointer rounded-[16px] p-16 flex flex-col items-center gap-5 transition-all duration-200"
+              style={{
+                border: `2px dashed ${dragging ? "var(--gold)" : "rgba(15,31,61,0.15)"}`,
+                background: dragging ? "var(--gold-light)" : "#FFFFFF",
+              }}
             >
-              <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center">
-                <Upload size={28} className="text-slate-400" />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(15,31,61,0.05)" }}>
+                <Upload size={26} style={{ color: "var(--text-tertiary)" }} />
               </div>
               <div className="text-center">
-                <p className="font-semibold text-slate-200 mb-1">Drop your denial letter here</p>
-                <p className="text-sm text-slate-500">or tap to choose a file · PDF, DOC, DOCX, JPG, PNG</p>
+                <p style={{ fontFamily: "var(--font-jakarta)", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.375rem" }}>
+                  Drop your denial letter here
+                </p>
+                <p style={{ fontSize: "0.875rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)" }}>
+                  or tap to choose a file · PDF, DOC, DOCX, JPG, PNG
+                </p>
               </div>
             </div>
+
+            <p className="text-center mt-4" style={{ fontSize: "0.8rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)" }}>
+              🔒 Your file is processed securely and never stored.
+            </p>
           </div>
         )}
 
@@ -95,7 +125,9 @@ export default function DenialPage() {
         {/* Loading */}
         {loading && (
           <div className="max-w-xl mx-auto mt-16 space-y-4">
-            <p className="text-sm text-slate-500 text-center mb-4">We're reading your letter…</p>
+            <p className="text-center mb-6" style={{ fontSize: "0.875rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)" }}>
+              We're reading your letter…
+            </p>
             <SkeletonCard /><SkeletonCard />
           </div>
         )}
@@ -104,45 +136,74 @@ export default function DenialPage() {
         {result && !loading && (
           <div className="mt-8 lg:grid lg:grid-cols-[1fr_320px] lg:gap-8 lg:items-start">
 
-            {/* ── Left column: details ── */}
+            {/* ── Left column ── */}
             <div className="space-y-5">
+
               {/* Contestable banner */}
-              <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-emerald-500/8 border border-emerald-500/20">
-                <CheckCircle size={18} className="text-emerald-400 shrink-0" />
-                <p className="text-emerald-300 font-medium">This denial looks contestable. Here's why.</p>
+              <div className="flex items-center gap-3 px-5 py-4 rounded-[12px] animate-fade-in-up"
+                style={{ background: "var(--success-bg)", border: "1px solid rgba(26,107,58,0.15)" }}>
+                <CheckCircle size={17} style={{ color: "var(--success)", flexShrink: 0 }} />
+                <p style={{ color: "var(--success)", fontFamily: "var(--font-inter)", fontWeight: 500, fontSize: "0.9rem" }}>
+                  This denial looks contestable. Here's why.
+                </p>
               </div>
 
               {/* Extracted details */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                <h2 className="font-semibold text-slate-100 flex items-center gap-2">
-                  <FileText size={16} className="text-[#C9A84C]" /> Denial details
-                </h2>
+              <div style={card} className="p-8 space-y-5 animate-fade-in-up stagger-1">
+                <h3 className="flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                  <FileText size={15} style={{ color: "var(--gold)" }} />
+                  Denial details
+                </h3>
+
                 {[
                   { label: "Patient",        val: result.patient_name },
                   { label: "Insurer",        val: result.insurer_name },
                   { label: "Service denied", val: result.service_denied ?? "See letter" },
                   { label: "Denial reason",  val: result.denial_reason },
                 ].map(({ label, val }) => (
-                  <div key={label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 border-b border-slate-800/60 pb-3 last:border-0 last:pb-0">
-                    <span className="text-xs text-slate-500 uppercase tracking-wide w-32 shrink-0 pt-0.5">{label}</span>
-                    <span className="text-slate-200 text-sm">{val}</span>
+                  <div key={label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-6 pb-4 last:pb-0"
+                    style={{ borderBottom: "1px solid rgba(15,31,61,0.06)" }}>
+                    <span style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase", minWidth: "8rem", paddingTop: "0.1rem" }}>
+                      {label}
+                    </span>
+                    <span style={{ fontSize: "0.9rem", color: "var(--text-primary)", fontFamily: "var(--font-inter)" }}>
+                      {val}
+                    </span>
                   </div>
                 ))}
-                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 border-b border-slate-800/60 pb-3">
-                  <span className="text-xs text-slate-500 uppercase tracking-wide w-32 shrink-0 pt-0.5">Claim ID</span>
-                  <span className="font-mono text-slate-300 text-sm">{result.claim_id}</span>
+
+                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-6 pb-4"
+                  style={{ borderBottom: "1px solid rgba(15,31,61,0.06)" }}>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase", minWidth: "8rem", paddingTop: "0.1rem" }}>
+                    Claim ID
+                  </span>
+                  <span className="font-mono-ref" style={{ color: "var(--text-secondary)" }}>
+                    {result.claim_id}
+                  </span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 border-b border-slate-800/60 pb-3">
-                  <span className="text-xs text-slate-500 uppercase tracking-wide w-32 shrink-0 pt-0.5">CPB cited</span>
-                  <span className="font-mono text-slate-300 text-sm">{result.cpb_code_cited}</span>
+
+                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-6 pb-4"
+                  style={{ borderBottom: "1px solid rgba(15,31,61,0.06)" }}>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase", minWidth: "8rem", paddingTop: "0.1rem" }}>
+                    CPB cited
+                  </span>
+                  <span className="font-mono-ref" style={{ color: "var(--text-secondary)" }}>
+                    {result.cpb_code_cited}
+                  </span>
                 </div>
-                <div className={`flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 pl-3 -ml-3 ${days !== null && days < DAYS_WARNING ? "border-l-2 border-amber-400" : ""}`}>
-                  <span className="text-xs text-slate-500 uppercase tracking-wide w-32 shrink-0 pt-0.5">Appeal deadline</span>
+
+                <div className={`flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-6 ${days !== null && days < DAYS_WARNING ? "pl-4 -ml-4" : ""}`}
+                  style={days !== null && days < DAYS_WARNING ? { borderLeft: "3px solid #C9A84C" } : {}}>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase", minWidth: "8rem", paddingTop: "0.1rem" }}>
+                    Appeal deadline
+                  </span>
                   <div>
-                    <span className="text-slate-200 text-sm">{result.deadline}</span>
+                    <span style={{ fontSize: "0.9rem", color: "var(--text-primary)", fontFamily: "var(--font-inter)" }}>
+                      {result.deadline}
+                    </span>
                     {days !== null && (
-                      <span className={`ml-2 text-xs font-medium ${days < DAYS_WARNING ? "text-amber-400" : "text-slate-500"}`}>
-                        {days < DAYS_WARNING && <AlertTriangle size={12} className="inline mr-1" />}
+                      <span className="ml-2 inline-flex items-center gap-1" style={{ fontSize: "0.8rem", fontWeight: 500, color: days < DAYS_WARNING ? "#92660A" : "var(--text-tertiary)", fontFamily: "var(--font-inter)" }}>
+                        {days < DAYS_WARNING && <AlertTriangle size={12} />}
                         {days} days remaining
                       </span>
                     )}
@@ -151,40 +212,54 @@ export default function DenialPage() {
               </div>
 
               {/* Plain English explanation */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
-                <h2 className="font-semibold text-slate-100">What they actually said — and why it may be wrong</h2>
+              <div style={card} className="p-8 space-y-6 animate-fade-in-up stagger-2">
+                <h3 style={{ color: "var(--text-primary)" }}>What they actually said — and why it may be wrong</h3>
+
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-2">What the denial says</p>
-                  <p className="text-slate-300 text-sm leading-relaxed">
+                  <p style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "0.625rem" }}>
+                    What the denial says
+                  </p>
+                  <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", fontFamily: "var(--font-inter)", lineHeight: 1.7, maxWidth: "65ch" }}>
                     {result.insurer_name} says this {result.service_denied ? `treatment (${result.service_denied})` : "service"} isn't covered based on their internal coverage guidelines. Their stated reason: {result.denial_reason.toLowerCase()}.
                   </p>
                 </div>
+
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-2">Why this is likely wrong</p>
-                  <p className="text-slate-300 text-sm leading-relaxed">
+                  <p style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "0.625rem" }}>
+                    Why this is likely wrong
+                  </p>
+                  <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", fontFamily: "var(--font-inter)", lineHeight: 1.7, maxWidth: "65ch" }}>
                     Most denials citing {result.cpb_code_cited !== "Not cited" ? `policy ${result.cpb_code_cited}` : "coverage criteria"} require the insurer to verify specific prior treatment steps. Denial letters frequently omit this verification — which is one of the most common reasons this type of denial gets overturned on appeal.
                   </p>
                 </div>
-                <div className="border-l-2 border-[#C9A84C] pl-4 py-2 bg-[#C9A84C]/5 rounded-r-xl">
-                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-2">What we found in their rulebook</p>
-                  <p className="text-slate-300 text-sm leading-relaxed">
+
+                <div className="pl-4 py-3 rounded-r-[8px] animate-fade-in-up"
+                  style={{ borderLeft: "3px solid var(--gold)", background: "var(--gold-light)" }}>
+                  <p style={{ fontSize: "0.75rem", color: "var(--text-tertiary)", fontFamily: "var(--font-inter)", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "0.5rem" }}>
+                    What we found in their rulebook
+                  </p>
+                  <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", fontFamily: "var(--font-inter)", lineHeight: 1.7, maxWidth: "65ch" }}>
                     {result.insurer_name}'s coverage criteria require documented evidence of medical necessity and, in most cases, a documented response to prior treatments. If your medical records support this, the denial is contestable.
                   </p>
                 </div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
-                  style={{ background: "rgba(26,107,58,0.08)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.15)" }}>
+
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                  style={{ background: "var(--success-bg)", border: "1px solid rgba(26,107,58,0.15)", fontSize: "0.875rem", fontWeight: 500, color: "var(--success)", fontFamily: "var(--font-inter)" }}>
                   70% of denials like this are overturned on appeal — KFF 2024
                 </div>
               </div>
 
               {/* Required docs */}
               {result.required_docs?.length > 0 && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                  <p className="text-sm font-medium text-slate-300 mb-3">Documents they say would support your appeal</p>
-                  <ul className="space-y-2">
+                <div style={card} className="p-8 animate-fade-in-up stagger-3">
+                  <p style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--text-primary)", fontFamily: "var(--font-inter)", marginBottom: "1rem" }}>
+                    Documents they say would support your appeal
+                  </p>
+                  <ul className="space-y-2.5">
                     {result.required_docs.map((doc, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-slate-400">
-                        <span className="text-[#C9A84C] mt-0.5">·</span> {doc}
+                      <li key={i} className="flex items-start gap-2.5" style={{ fontSize: "0.875rem", color: "var(--text-secondary)", fontFamily: "var(--font-inter)" }}>
+                        <span style={{ color: "var(--gold)", marginTop: "0.1rem", flexShrink: 0 }}>·</span>
+                        {doc}
                       </li>
                     ))}
                   </ul>
@@ -192,20 +267,25 @@ export default function DenialPage() {
               )}
             </div>
 
-            {/* ── Right column: TL;DR + CTA (sticky on desktop) ── */}
+            {/* ── Right column: TL;DR + CTA (sticky) ── */}
             <div className="mt-5 lg:mt-0 lg:sticky lg:top-24 space-y-4">
+
               {/* TL;DR card */}
-              <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/30 bg-slate-900">
-                {/* Glow accent */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C]/60 to-transparent" />
-                <div className="p-6">
+              <div className="rounded-[16px] overflow-hidden animate-fade-in-up"
+                style={{ background: "#FFFFFF", border: "1px solid var(--gold-border)", boxShadow: "0 2px 8px rgba(15,31,61,0.06)" }}>
+                <div className="px-6 pt-5 pb-1">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-7 h-7 rounded-lg bg-[#C9A84C]/15 flex items-center justify-center">
-                      <Zap size={14} className="text-[#C9A84C]" />
+                    <div className="w-7 h-7 rounded-[8px] flex items-center justify-center"
+                      style={{ background: "var(--gold-light)" }}>
+                      <Zap size={13} style={{ color: "var(--gold)" }} />
                     </div>
-                    <span className="text-xs font-semibold text-[#C9A84C] uppercase tracking-widest">TL;DR</span>
+                    <span style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--gold)", fontFamily: "var(--font-inter)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                      TL;DR
+                    </span>
                   </div>
-                  <p className="text-slate-200 text-sm leading-relaxed">
+                </div>
+                <div className="px-6 pb-6">
+                  <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", fontFamily: "var(--font-inter)", lineHeight: 1.7 }}>
                     {result.tldr || `${result.insurer_name} denied your ${result.service_denied ?? "claim"}. You have until ${result.deadline} to appeal.`}
                   </p>
                 </div>
@@ -213,9 +293,12 @@ export default function DenialPage() {
 
               {/* Urgency chip */}
               {days !== null && days < DAYS_WARNING && (
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-amber-500/8 border border-amber-500/20 text-amber-300 text-sm">
-                  <AlertTriangle size={15} className="shrink-0" />
-                  <span><strong>{days} days</strong> left to appeal</span>
+                <div className="flex items-center gap-2 px-4 py-3 rounded-[12px] animate-fade-in-up stagger-1"
+                  style={{ background: "rgba(180,130,0,0.06)", border: "1px solid rgba(180,130,0,0.20)", fontSize: "0.875rem", fontFamily: "var(--font-inter)" }}>
+                  <AlertTriangle size={15} style={{ color: "#92660A", flexShrink: 0 }} />
+                  <span style={{ color: "#7A5500" }}>
+                    <strong>{days} days</strong> left to appeal
+                  </span>
                 </div>
               )}
 

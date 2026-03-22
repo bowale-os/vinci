@@ -2,13 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 :root {
-  --background: #020817;
-  --foreground: #f8fafc;
-  --gold: #C9A84C;
-  --navy: #0F1F3D;
+  --navy:           #0F1F3D;
+  --gold:           #C9A84C;
+  --gold-light:     rgba(201, 168, 76, 0.10);
+  --gold-border:    rgba(201, 168, 76, 0.25);
+  --warm-white:     #FAFAF8;
+  --card:           #FFFFFF;
+  --text-primary:   #0F1F3D;
+  --text-secondary: #4A5568;
+  --text-tertiary:  #718096;
+  --success:        #1A6B3A;
+  --success-bg:     rgba(26, 107, 58, 0.08);
 }
 
 * { box-sizing: border-box; }
@@ -16,22 +21,64 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: var(--warm-white);
+  color: var(--text-primary);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Gold focus ring for inputs */
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #C9A84C !important;
-  box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+/* ─── Typography ──────────────────────────────────────────── */
+
+h1 {
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-size: clamp(2rem, 4vw, 3.5rem);
 }
 
-/* Skeleton shimmer */
+h2 {
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+h3 {
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+/* ─── Form focus ─────────────────────────────────────────── */
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--warm-white); }
+::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #A0AEC0; }
+
+/* ─── Paper card (letter page) ───────────────────────────── */
+
+.paper-card {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(15, 31, 61, 0.08), 0 4px 24px rgba(15, 31, 61, 0.08);
+}
+
+/* ─── Skeleton shimmer (light theme) ────────────────────── */
+
 .skeleton {
-  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background: linear-gradient(90deg, #e8ecf0 25%, #f4f6f8 50%, #e8ecf0 75%);
   background-size: 400px 100%;
   animation: shimmer 1.8s infinite linear;
 }
@@ -41,22 +88,40 @@ input:focus, textarea:focus, select:focus {
   100% { background-position: 400px 0;  }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0f172a; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+/* ─── Page entrance animation ────────────────────────────── */
 
-/* Paper texture for letter */
-.paper-card {
-  background: #ffffff;
-  box-shadow: inset 0 0 0 1px rgba(15,31,61,0.08), 0 4px 24px rgba(0,0,0,0.3);
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.stagger-1 { animation-delay: 0.07s; }
+.stagger-2 { animation-delay: 0.14s; }
+.stagger-3 { animation-delay: 0.21s; }
+.stagger-4 { animation-delay: 0.28s; }
+.stagger-5 { animation-delay: 0.35s; }
+
+/* ─── Toast slide-in ─────────────────────────────────────── */
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.25s ease-out;
+}
+
+/* ─── Utilities ──────────────────────────────────────────── */
+
 @layer utilities {
-  .text-balance { text-wrap: balance; }
-  .font-mono-ref { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; }
-  .gold-border-left { border-left: 3px solid #C9A84C; }
-  .amber-border-left { border-left: 3px solid #F59E0B; }
-  .green-border-left { border-left: 3px solid #22c55e; }
+  .text-balance    { text-wrap: balance; }
+  .font-mono-ref   { font-family: var(--font-mono), 'JetBrains Mono', monospace; font-size: 0.875rem; }
+  .gold-border-left { border-left: 3px solid var(--gold); }
+  .max-prose       { max-width: 65ch; }
 }
